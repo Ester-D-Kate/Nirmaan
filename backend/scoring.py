@@ -37,36 +37,45 @@ class ScoringEngine:
         self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
         return Groq(api_key=key)
     def _call_llm(self, transcript: str) -> Dict[str, Any]:
-        """Calls Groq API to analyze the transcript using the official library."""
-        client = self._get_client()
-        
         prompt = f"{Config.SYSTEM_PROMPT}\n\nTranscript:\n{transcript}"
         
-        try:
-            logger.info(f"Sending request to Groq LLM with model: {Config.MODEL_NAME}")
-            chat_completion = client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
-                ],
-                model=Config.MODEL_NAME,
-                response_format={"type": "json_object"}
-            )
-            
-            content = chat_completion.choices[0].message.content
-            logger.info(f"Received response from LLM: {content}")
-            return json.loads(content)
-        except Exception as e:
-            logger.error(f"LLM Call failed: {e}")
+        max_retries = len(self.api_keys)
+        last_error = None
+        
+        for attempt in range(max_retries):
+            try:
+                client = self._get_client()
+                logger.info(f"Sending request to Groq LLM with model: {Config.MODEL_NAME} (attempt {attempt + 1}/{max_retries})")
+                chat_completion = client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt,
+                        }
+                    ],
+                    model=Config.MODEL_NAME,
+                    response_format={"type": "json_object"}
+                )
+                
+                content = chat_completion.choices[0].message.content
+                logger.info(f"Received response from LLM: {content}")
+                return json.loads(content)
+            except Exception as e:
+                last_error = e
+                logger.warning(f"LLM Call failed (attempt {attempt + 1}/{max_retries}): {e}")
+                
+                if attempt < max_retries - 1:
+                    logger.info(f"Retrying with next API key...")
+        
+        logger.error(f"All LLM API keys failed. Last error: {last_error}")
+        
+        return {
+            "Salutation Level": "Normal",
+            "Keyword Presence": [],
+            "Flow": "Order Not followed",
+            "Engagement": "Neutral"
+        }
 
-            return {
-                "Salutation Level": "Normal",
-                "Keyword Presence": [],
-                "Flow": "Order Not followed",
-                "Engagement": "Neutral"
-            }
 
     def calculate_rule_based(self, text: str, duration_sec: int = None) -> Dict[str, Any]:
         words = re.findall(r'\b\w+\b', text.lower())
