@@ -76,7 +76,10 @@
 
                 mediaRecorder.addEventListener('stop', () => {
                     console.log('Recording stopped');
-                    recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    // Use the actual MIME type from the recorder
+                    const mimeType = mediaRecorder.mimeType || 'audio/webm';
+                    recordedBlob = new Blob(audioChunks, { type: mimeType });
+                    console.log('Recorded audio type:', mimeType);
                     const audioUrl = URL.createObjectURL(recordedBlob);
                     audioPlayback.src = audioUrl;
                     audioPlayback.classList.remove('hidden');
@@ -138,7 +141,9 @@
 
             try {
                 const formData = new FormData();
-                formData.append('audio_file', recordedBlob, 'recording.wav');
+                // Use appropriate file extension based on MIME type
+                const extension = recordedBlob.type.includes('webm') ? 'webm' : 'wav';
+                formData.append('audio_file', recordedBlob, `recording.${extension}`);
                 formData.append('duration', seconds);
 
                 console.log('Submitting recording...');
