@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nirmaan AI - Scoring System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Nirmaan AI</h1>
+            <p class="subtitle">Advanced Self-Introduction Analysis</p>
+        </header>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="text">Text Input</button>
+            <button class="mode-btn" data-mode="audio">Audio Analysis</button>
+        </div>
+
+        <div class="input-section">
+            <!-- Text Mode -->
+            <div id="text-mode" class="mode-content active">
+                <h2>Analyze Transcript</h2>
+                <form id="text-form">
+                    <div class="form-group">
+                        <label for="transcript">Your Introduction</label>
+                        <textarea id="transcript" rows="6" placeholder="Paste your self-introduction text here..."
+                            required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="text-duration">Duration (seconds)</label>
+                        <input type="number" id="text-duration" placeholder="e.g. 45" min="1">
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <span class="btn-text">Analyze Text</span>
+                        <div class="loader hidden"></div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Audio Mode -->
+            <div id="audio-mode" class="mode-content">
+                <h2>Audio Analysis</h2>
+
+                <div class="audio-tabs">
+                    <button class="audio-tab active" data-tab="record">Record</button>
+                    <button class="audio-tab" data-tab="upload">Upload</button>
+                </div>
+
+                <!-- Record Tab -->
+                <div id="record-tab" class="audio-tab-content active">
+                    <div class="recording-interface">
+                        <div class="recording-status">
+                            <span id="recording-time">00:00</span>
+                        </div>
+                        <button id="record-btn" class="record-btn">
+                            <div class="record-icon"></div>
+                        </button>
+                        <p class="status-text">Tap to start recording</p>
+
+                        <audio id="audio-playback" controls class="hidden"
+                            style="width: 100%; margin-bottom: 1.5rem;"></audio>
+
+                        <button id="submit-recording" class="submit-btn hidden">
+                            <span class="btn-text">Analyze Recording</span>
+                            <div class="loader hidden"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upload Tab -->
+                <div id="upload-tab" class="audio-tab-content">
+                    <form id="audio-upload-form">
+                        <div class="form-group">
+                            <label class="file-upload-label" for="audio-file">
+                                <div class="upload-icon">📁</div>
+                                <span id="file-name">Click to browse audio file</span>
+                            </label>
+                            <input type="file" id="audio-file" accept="audio/*" class="hidden">
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <span class="btn-text">Upload & Analyze</span>
+                            <div class="loader hidden"></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="results-section hidden">
+            <div class="score-container">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" class="score-circle-bg"></circle>
+                    <circle cx="100" cy="100" r="90" class="score-circle-progress" id="score-circle"
+                        stroke-dasharray="565" stroke-dashoffset="565"></circle>
+                </svg>
+                <div class="score-text">
+                    <div class="score-number" id="overall-score">0</div>
+                    <div class="score-label">Overall Score</div>
+                </div>
+            </div>
+
+            <div id="transcription-box" class="transcription-box hidden">
+                <h3>Transcription</h3>
+                <p id="transcription-text" class="transcription-text"></p>
+            </div>
+
+            <div class="breakdown-grid" id="breakdown-items">
+                <!-- Items injected via JS -->
+            </div>
+
+            <button id="reset-btn" class="submit-btn" style="margin-top: 2rem; background: rgba(255,255,255,0.1);">
+                Analyze Another
+            </button>
+        </div>
+
+        <!-- Error Section -->
+        <div id="error-section" class="hidden" style="padding: 2rem;">
+            <div class="error-message">
+                <h3>Analysis Failed</h3>
+                <p>We couldn't process your request. Please check the backend connection.</p>
+            </div>
+            <button id="error-reset-btn" class="submit-btn" style="margin-top: 1rem;">Try Again</button>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/text.js"></script>
+    <script src="js/audio.js"></script>
+</body>
+
+</html>
